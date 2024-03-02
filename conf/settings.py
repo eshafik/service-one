@@ -16,6 +16,9 @@ import os
 import environ
 from datetime import timedelta
 
+import redis
+from opentelemetry.instrumentation.django import settings
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from app_libs.logger_config import LOGGING
 
@@ -56,14 +59,17 @@ THIRD_PARTY = [
     'rest_framework_simplejwt',
     'django_extensions',
     'corsheaders',
+    'django_prometheus',
 ]
 SYSTEM_APPS = [
     'apps.user',
+    'apps.twitter'
 ]
 
 INSTALLED_APPS += THIRD_PARTY + SYSTEM_APPS
 
 DEFAULT_MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -71,18 +77,15 @@ DEFAULT_MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 ON_TOP_MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware', ]
 
-
+settings.USE_OPENTELEMETRY = True
 THIRD_PARTY_MIDDLEWARE = []
 
-SERVICE_MIDDLEWARE = [
-    'base.middleware.AuthMiddleware',
-]
-
-MIDDLEWARE = ON_TOP_MIDDLEWARE + DEFAULT_MIDDLEWARE + THIRD_PARTY_MIDDLEWARE + SERVICE_MIDDLEWARE
+MIDDLEWARE = ON_TOP_MIDDLEWARE + DEFAULT_MIDDLEWARE + THIRD_PARTY_MIDDLEWARE
 
 ROOT_URLCONF = 'conf.urls'
 
@@ -232,3 +235,19 @@ SIMPLE_JWT = {
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+PROMETHEUS_METRIC_NAMESPACE = 'service_one'
+PROMETHEUS_METRICS_URL = 'http://localhost:9090'
+
+OTEL_TRACE_ENDPOINT = 'http://localhost:4318/v1/traces'
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+    }
+}
+
+redis_instance = redis.Redis(host='localhost', port=6379, decode_responses=True)
+
+RABBITMQ_URL='amqp://test:test123@localhost/'

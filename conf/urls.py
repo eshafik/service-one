@@ -20,7 +20,8 @@ from django.conf.urls import handler404
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('apis/v1/', include("apis.urls")),
+    path('api/v1/', include("apis.urls")),
+    path('', include('django_prometheus.urls')),
 ]
 
 handler404 = 'apps.user.views.error404'

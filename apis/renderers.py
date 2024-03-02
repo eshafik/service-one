@@ -48,6 +48,7 @@ class DefaultRenderer(JSONRenderer):
         response_data = {'success': (response.status_code // 100) not in (4, 5)}
         if response_data['success']:
             if data:
+                print("data", data)
                 if 'message' in data or 'meta_data' in data or 'data' in data:
                     response_data.update(data)
                 else:
