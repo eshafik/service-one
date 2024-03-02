@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  service_one:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      sh -c "python manage.py runserver 0.0.0.0:8000"
+    restart: always
+    ports:
+      - "8001:8000"
+    environment:
+      - .env
+    volumes:
+      - .:/code
+    extra_hosts:
+      - host.docker.internal:host-gateway

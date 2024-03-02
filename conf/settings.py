@@ -237,17 +237,18 @@ SIMPLE_JWT = {
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 PROMETHEUS_METRIC_NAMESPACE = 'service_one'
-PROMETHEUS_METRICS_URL = 'http://localhost:9090'
+PROMETHEUS_METRICS_URL = env('PROMETHEUS_METRICS_URL',  default='http://localhost:9090')
 
-OTEL_TRACE_ENDPOINT = 'http://localhost:4318/v1/traces'
+OTEL_TRACE_ENDPOINT = env('OTEL_TRACE_ENDPOINT', default='http://localhost:4318/v1/traces')
 
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379",
+        "LOCATION": env('REDIS_URL', default="redis://127.0.0.1:6379"),
     }
 }
 
-redis_instance = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
-RABBITMQ_URL='amqp://test:test123@localhost/'
+RABBITMQ_URL=env('RABBITMQ_URL', default='amqp://test:test123@localhost/')
+
+SERVICE_TWO_BASE_URL = env('SERVICE_TWO_BASE_URL', default='http://localhost:8002')

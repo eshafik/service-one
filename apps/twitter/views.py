@@ -15,7 +15,6 @@ from rest_framework.generics import ListAPIView
 from app_libs.rabbitmq_utils import publish_message
 from apps.twitter.models import FeedPost
 from apps.twitter.serializer import FeedPostSerializer
-from conf.settings import redis_instance
 
 
 class FeedDataListAPI(ListAPIView):
@@ -30,7 +29,7 @@ class FeedDataListAPI(ListAPIView):
 
     def list(self, request, *args, **kwargs):
         _type = self.request.query_params.get('type')
-        response = requests.get(url=f'http://localhost:8002/api/v1/twitters/feed?type={_type}')
+        response = requests.get(url=f'{settings.SERVICE_TWO_BASE_URL}/api/v1/twitters/feed?type={_type}')
 
         with self.tracer.start_as_current_span("send_rabbitmq_message"):
             # Serialize the current context into a carrier
