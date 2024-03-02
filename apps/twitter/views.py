@@ -29,8 +29,8 @@ class FeedDataListAPI(ListAPIView):
             return queryset
 
     def list(self, request, *args, **kwargs):
-
-        response = requests.get(url='http://localhost:8002/api/v1/twitters/feed')
+        _type = self.request.query_params.get('type')
+        response = requests.get(url=f'http://localhost:8002/api/v1/twitters/feed?type={_type}')
 
         with self.tracer.start_as_current_span("send_rabbitmq_message"):
             # Serialize the current context into a carrier
